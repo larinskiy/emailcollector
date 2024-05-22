@@ -20,7 +20,7 @@ def get_key(domain):
     key = response.text
     status = response.status_code
     if status == 402:
-        exit('[-] Your IP is rate limited. Try switching your IP address then re-run.')
+        exit('[-] Your IP or token is rate limited. Try switching your IP address or wait some time then re-run.')
     else:
         return key
 
@@ -38,7 +38,7 @@ def make_request(key):
     items = response.text
     status = response.status_code
     if status == 402:
-        exit('[-] Your IP is rate limited. Try switching your IP address then re-run.')
+        exit('[-] Your IP or token is rate limited. Try switching your IP address or wait some time then re-run.')
     else:
         return items
 
