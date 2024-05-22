@@ -123,6 +123,6 @@ if len(validated) != 0 or len(not_validated) != 0:
         print('Valid:\n', '\n'.join(validated), file=file)
         print('Invalid:\n', '\n'.join(not_validated), file=file)
     print(f"[+] {len(validated)} valid and {len(not_validated)
-                                            } invalid emails was collected in file checked.email.txt")
+                                            } invalid emails was collected in file checked_email.txt")
 else:
     print("[-] Something went wrong. No addressess was discovered")
