@@ -1,0 +1,6 @@
+smtplib
+dnspython
+tqdm
+requests
+jsonlib
+regex
