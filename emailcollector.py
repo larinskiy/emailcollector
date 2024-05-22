@@ -73,10 +73,18 @@ def validate_email(email, mx_records):
 
 
 if input('[?] Do you want to make search for domain emails via Phonebook.cz? [Y/N] ').upper() == 'Y':
-    token = ''
-    while not (re.search(r"[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}", token)):
-        token = input(
-            '[?] Specify valid Phonebook.cz token: [Get it after authorization on Phonebook.cz] ').lower()
+    if os.path.isfile('.token'):
+        with open('.token') as tokenfile:
+            token = tokenfile.readline().strip()
+        print('[+] Found cached token for Phonebook.cz in file .token')
+    else:
+        token = ''
+        print('[!] Not found cached token for Phonebook.cz in file .token')
+        while not (re.search(r"[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}", token)):
+            token = input(
+                '[?] Specify valid Phonebook.cz token: [Get it after authorization on Phonebook.cz] ').lower()
+        with open('.token', 'w') as tokenfile:
+            tokenfile.write(token)
     domain = input(
         '[?] Specify the domain name for email search: [For ex. company.com] ')
     key = get_key(domain)
@@ -90,6 +98,7 @@ if input('[?] Do you want to make search for domain emails via Phonebook.cz? [Y/
         collected_emails_file = 'collected_emails.txt'
     else:
         exit('[-] No emails was found. Try use another domain name or run without Phonebook.cz')
+    del emails
 else:
     collected_emails_file = -1
     while not os.path.isfile(collected_emails_file):
@@ -97,7 +106,7 @@ else:
             '[?] Specify path to emails file: [For.ex emails.txt] ')
 validation_email = input(
     '[?] Specify valid existing email address for validation or press Enter: [Def. info@gmail.com] ')
-if not (re.search('\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b', validation_email)):
+if not (re.search(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b', validation_email)):
     validation_email = 'info@gmail.com'
 print(f'[+] Email address for validation is set to {validation_email}')
 validated = []
