@@ -72,7 +72,7 @@ def validate_email(email, mx_records):
     return False
 
 
-if input('[?] Do you want to make search for domain emails via Phonebook.cz? [Y/N] ').upper() == 'Y':
+if input('[?] Do you want to search for domain emails via Phonebook.cz? [Y/N] ').upper() == 'Y':
     if os.path.isfile('.token'):
         with open('.token') as tokenfile:
             token = tokenfile.readline().strip()
