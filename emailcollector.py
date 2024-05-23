@@ -21,7 +21,7 @@ def get_key(domain):
     key = response.text
     status = response.status_code
     if status == 402:
-        exit('[-] Your IP or token is rate limited. Try switching your IP address or wait some time then re-run.')
+        exit('[-] Your IP or token are rate limited. Try switching your IP address or wait some time then re-run.')
     else:
         return key
 
@@ -39,7 +39,7 @@ def make_request(key):
     items = response.text
     status = response.status_code
     if status == 402:
-        exit('[-] Your IP or token is rate limited. Try switching your IP address or wait some time then re-run.')
+        exit('[-] Your IP or token are rate limited. Try switching your IP address or wait some time then re-run.')
     else:
         return items
 
@@ -72,6 +72,17 @@ def validate_email(email, mx_records):
             continue
     return False
 
+
+print('███████╗███╗   ███╗ █████╗ ██╗██╗          ██████╗ ██████╗ ██╗     ██╗     ███████╗ ██████╗████████╗ ██████╗ ██████╗ \n\
+██╔════╝████╗ ████║██╔══██╗██║██║         ██╔════╝██╔═══██╗██║     ██║     ██╔════╝██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗\n\
+█████╗  ██╔████╔██║███████║██║██║         ██║     ██║   ██║██║     ██║     █████╗  ██║        ██║   ██║   ██║██████╔╝\n\
+██╔══╝  ██║╚██╔╝██║██╔══██║██║██║         ██║     ██║   ██║██║     ██║     ██╔══╝  ██║        ██║   ██║   ██║██╔══██╗\n\
+███████╗██║ ╚═╝ ██║██║  ██║██║███████╗    ╚██████╗╚██████╔╝███████╗███████╗███████╗╚██████╗   ██║   ╚██████╔╝██║  ██║\n\
+╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚══════╝     ╚═════╝ ╚═════╝ ╚══════╝╚══════╝╚══════╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝\n\
+A tool for collecting and validating emails via SMTP\n\
+https://github.com/larinskiy/emailcollector\n\n\
+Check -h for futher information\n\
+Based on tools: Phonebook.cz -> SMTP\n')
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -122,22 +133,23 @@ else:
         collected_emails_file = args.input_list
     else:
         collected_emails_file = -1
-    while not os.path.isfile(collected_emails_file):
-        collected_emails_file = input(
-            '[?] Specify path to emails file: [For.ex emails.txt] ')
-if args.email:
+        while not os.path.isfile(collected_emails_file):
+            collected_emails_file = input(
+                '[?] Specify path to emails file: [For.ex collected_emails.txt] ')
+    domain_name = f'for_{
+        re.search(r"[\w-]+?(?=\.)", collected_emails_file).group()}'
+if args.email and re.search(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b', args.email):
     validation_email = args.email
 else:
-    validation_email = input(
-        '[?] Specify valid existing email address for validation or press Enter: [Def. info@gmail.com] ')
-if not (re.search(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b', validation_email)):
     validation_email = 'info@gmail.com'
 print(f'[+] Email address for validation is set to {validation_email}')
 validated = []
 not_validated = []
 mx_dict = {}
+print('[+] Started validation for emails via SMTP')
 with (open(collected_emails_file) as file):
-    for email in tqdm(file.readlines(), desc="Validating", unit="mail"):
+    bar = tqdm(file.readlines(), desc="Validating", unit="mail")
+    for email in bar:
         email = email.strip()
         domain = email.split('@')[1]
         if domain in mx_dict:
@@ -149,6 +161,8 @@ with (open(collected_emails_file) as file):
             validated.append(email)
         else:
             not_validated.append(email)
+        tqdm.set_postfix(bar, Valid=len(validated),
+                         Invalid=len(not_validated))
 if len(validated) != 0 or len(not_validated) != 0:
     with open(f'checked_emails_{domain_name}.txt', 'w') as file:
         print(f'Count of valid emails: {len(validated)}', file=file)
