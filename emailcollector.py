@@ -143,20 +143,19 @@ if args.email and re.search(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}
 else:
     validation_email = 'info@gmail.com'
 print(f'[+] Email address for validation is set to {validation_email}')
-validated = []
-not_validated = []
-mx_dict = {}
+
 print('[+] Started validation for emails via SMTP')
 with (open(collected_emails_file) as file):
+    validated = []
+    not_validated = []
+    mx_dict = {}
     bar = tqdm(file.readlines(), desc="Validating", unit="mail")
     for email in bar:
         email = email.strip()
         domain = email.split('@')[1]
-        if domain in mx_dict:
-            mx_records = mx_dict[domain]
-        else:
-            mx_records = get_mx_records(domain)
-            mx_dict[domain] = mx_records
+        if not (domain in mx_dict):
+            mx_dict[domain] = get_mx_records(domain)
+        mx_records = mx_dict[domain]
         if validate_email(email, mx_records):
             validated.append(email)
         else:
