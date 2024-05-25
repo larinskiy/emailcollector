@@ -82,11 +82,11 @@ print('███████╗███╗   ███╗ █████╗ �
 A tool for collecting and validating emails via SMTP\n\
 https://github.com/larinskiy/emailcollector\n\n\
 Check -h for futher information\n\
-Based on tools: Phonebook.cz -> SMTP\n\
+Based on tools: Phonebook.cz -> SMTP\n\n\
 =================!!!CAUTION!!!==================\n\
           DO NOT USE THIS TOOL FOR DOS!         \n\
        YOU IP ADDRESS MAY BE SPAM LISTED!       \n\
-================================================')
+================================================\n')
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
