@@ -8,6 +8,18 @@ import os
 import argparse
 
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+
 def get_key(domain):
     url = f"https://2.intelx.io:443/phonebook/search?k={token}"
     headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:101.0) Gecko/20100101 Firefox/101.0",
@@ -73,20 +85,21 @@ def validate_email(email, mx_records):
     return False
 
 
-print('███████╗███╗   ███╗ █████╗ ██╗██╗          ██████╗ ██████╗ ██╗     ██╗     ███████╗ ██████╗████████╗ ██████╗ ██████╗ \n\
+print(f'{bcolors.HEADER}\
+███████╗███╗   ███╗ █████╗ ██╗██╗          ██████╗ ██████╗ ██╗     ██╗     ███████╗ ██████╗████████╗ ██████╗ ██████╗ \n\
 ██╔════╝████╗ ████║██╔══██╗██║██║         ██╔════╝██╔═══██╗██║     ██║     ██╔════╝██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗\n\
 █████╗  ██╔████╔██║███████║██║██║         ██║     ██║   ██║██║     ██║     █████╗  ██║        ██║   ██║   ██║██████╔╝\n\
 ██╔══╝  ██║╚██╔╝██║██╔══██║██║██║         ██║     ██║   ██║██║     ██║     ██╔══╝  ██║        ██║   ██║   ██║██╔══██╗\n\
 ███████╗██║ ╚═╝ ██║██║  ██║██║███████╗    ╚██████╗╚██████╔╝███████╗███████╗███████╗╚██████╗   ██║   ╚██████╔╝██║  ██║\n\
 ╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚══════╝     ╚═════╝ ╚═════╝ ╚══════╝╚══════╝╚══════╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝\n\
 A tool for collecting and validating emails via SMTP\n\
-https://github.com/larinskiy/emailcollector\n\n\
+https://github.com/larinskiy/emailcollector{bcolors.ENDC}\n\n\
 Check -h for futher information\n\
-Based on tools: Phonebook.cz -> SMTP\n\n\
+Based on tools: Phonebook.cz -> SMTP{bcolors.FAIL}\n\n\
 =================!!!CAUTION!!!==================\n\
           DO NOT USE THIS TOOL FOR DOS!         \n\
-       YOU IP ADDRESS MAY BE SPAM LISTED!       \n\
-================================================\n')
+       YOUR IP ADDRESS MAY BE SPAM LISTED!      \n\
+================================================\n{bcolors.ENDC}')
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -99,38 +112,40 @@ parser.add_argument(
     '--email', '-e', help='Valid email address for list verification')
 args = parser.parse_args()
 
-if args.domain or input('[?] Do you want to search for domain emails via Phonebook.cz? [Y/N] ').upper() == 'Y':
+if args.domain or input(f'[{bcolors.OKBLUE}?{bcolors.ENDC}] Do you want to search for domain emails via Phonebook.cz? [Y/N] ').upper() == 'Y':
     if os.path.isfile('.token'):
         with open('.token') as tokenfile:
             token = tokenfile.readline().strip()
-        print('[+] Found cached token for Phonebook.cz in file .token')
+        print(
+            f'[{bcolors.OKGREEN}+{bcolors.ENDC}] Found cached token for Phonebook.cz in file .token')
     else:
         if args.token:
             token = args.token
         else:
             token = ''
-        print('[!] Not found cached token for Phonebook.cz in file .token')
+        print(f'[{bcolors.WARNING}!{
+              bcolors.ENDC}] Not found cached token for Phonebook.cz in file .token')
         while not (re.search(r"[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}", token)):
             token = input(
-                '[?] Specify valid Phonebook.cz token: [Get it after authorization on Phonebook.cz] ').lower()
+                'f[{bcolors.OKBLUE}?{bcolors.ENDC}] Specify valid Phonebook.cz token: [Get it after authorization on Phonebook.cz] ').lower()
         with open('.token', 'w') as tokenfile:
             tokenfile.write(token)
     if args.domain:
         domain_name = args.domain
     else:
         domain_name = input(
-            '[?] Specify the domain name for email search: [For ex. company.com] ')
+            f'[{bcolors.OKBLUE}?{bcolors.ENDC}] Specify the domain name for email search: [For ex. company.com] ')
     key = get_key(domain_name)
     answer = json.loads(make_request(key))['selectors']
     emails = sorted(set(email['selectorvalue'] for email in answer))
     if len(emails) != 0:
         print(
-            f'[+] {len(emails)} addresses was collected in file collected_emails_{domain_name}.txt')
+            f'[{bcolors.OKGREEN}+{bcolors.ENDC}] {len(emails)} addresses was collected in file collected_emails_{domain_name}.txt')
         with open(f'collected_emails_{domain_name}.txt', 'w') as file:
             print('\n'.join(emails), file=file)
         collected_emails_file = f'collected_emails_{domain_name}.txt'
     else:
-        exit('[-] No emails was found. Try use another domain name or run without Phonebook.cz')
+        exit(f'[{bcolors.FAIL}-{bcolors.ENDC}] No emails was found. Try use another domain name or run without Phonebook.cz')
     del emails
 else:
     if args.input_list:
@@ -139,16 +154,16 @@ else:
         collected_emails_file = -1
         while not os.path.isfile(collected_emails_file):
             collected_emails_file = input(
-                '[?] Specify path to emails file: [For.ex collected_emails.txt] ')
+                f'[{bcolors.OKBLUE}?{bcolors.ENDC}] Specify path to emails file: [For.ex collected_emails.txt] ')
     domain_name = f'for_{
         re.search(r"[\w-]+?(?=\.)", collected_emails_file).group()}'
 if args.email and re.search(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b', args.email):
     validation_email = args.email
 else:
     validation_email = 'info@gmail.com'
-print(f'[+] Email address for validation is set to {validation_email}')
+print(f'[{bcolors.OKGREEN}+{bcolors.ENDC}] Email address for validation is set to {validation_email}')
 
-print('[+] Started validation for emails via SMTP')
+print(f'[{bcolors.OKGREEN}+{bcolors.ENDC}] Started validation for emails via SMTP')
 with (open(collected_emails_file) as file):
     validated = []
     not_validated = []
@@ -172,7 +187,7 @@ if len(validated) != 0 or len(not_validated) != 0:
         print(f'Count of invalid emails: {len(not_validated)}', file=file)
         print('Valid:\n', '\n'.join(validated), file=file)
         print('Invalid:\n', '\n'.join(not_validated), file=file)
-    print(f"[+] {len(validated)} valid and {len(not_validated)
-                                            } invalid emails was collected in file checked_email_{domain_name}.txt")
+    print(f"[{bcolors.OKGREEN}+{bcolors.ENDC}] {len(validated)} valid and {len(not_validated)
+                                                                           } invalid emails was collected in file checked_email_{domain_name}.txt")
 else:
-    print("[-] Something went wrong. No addressess was discovered")
+    print(f"[{bcolors.FAIL}-{bcolors.ENDC}] Something went wrong. No addressess was discovered")
